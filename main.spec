@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['C:/Users/Anton/PycharmProjects/IOTdata_parser/main.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
     datas=[],
