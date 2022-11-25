@@ -45,7 +45,7 @@ finally:
             d_start = pd.to_datetime(values['-d_start-'])
             d_finish = pd.to_datetime(values['-d_stop-'])
 
-            if link == '':
+            if ((link == '') or (carid_str == '') or (d_start_str == '') or (d_finish_str == '')) and ((values['-link-'] == '') or (values['-carid-'] == '') or (values['-d_start-'] == '') or (values['-d_stop-'] == '')):
                 sg.popup('проверьте ini')
                 break
 
