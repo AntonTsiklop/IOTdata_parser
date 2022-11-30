@@ -21,6 +21,8 @@ try:
     d_finish_str = input_data.get('input_data', 'd_finish')
     d_start = pd.to_datetime(d_start_str)
     d_finish = pd.to_datetime(d_finish_str)
+except:
+    pass
 finally:
     sg.theme('DarkAmber')
 
@@ -29,14 +31,14 @@ finally:
                 [sg.InputText(key='-d_start-', default_text= d_start_str), sg.Text('Начало (гггг-мм-дд чч:мм:сс)')],
                 [sg.InputText(key='-d_stop-', default_text= d_finish_str), sg.Text('Конец (гггг-мм-дд чч:мм:сс)')],
                 [sg.ProgressBar(max_value=100000, orientation='h', size=(30,15), key='-PROG-'), sg.Text('Обработка данных')],
-                [sg.Button('Старт')]  ]
+                [sg.Button('Старт'), sg.Button('Выход')]  ]
 
-    window = sg.Window('Ввод данных', layout)
+    window = sg.Window('Ввод данных', layout, finalize=True)
 
     while True:
         event, values = window.read()
 
-        if event == sg.WIN_CLOSED:
+        if event == sg.WIN_CLOSED or event == 'Выход':
             break
 
         if event == 'Старт':
@@ -65,23 +67,24 @@ finally:
             ini.close()
 
         cur_dir = os.getcwd()
-
+        window['-PROG-'].update_bar(10000)
         request = requests.get(link)
         data = request.text
         soup = BeautifulSoup(data, 'lxml')
+        window['-PROG-'].update_bar(20000)
         data_all_code = soup.find_all('code')
-
+        window['-PROG-'].update_bar(35000)
         data_col_names = data_all_code[20].text.split('&')
         columns_names = [data.split('=')[0] for data in data_col_names]
 
         data_all = []
-        step = 100000/len(data_all_code)
-        i = 1
-        for elem in data_all_code:
+        step = 65000/len(data_all_code)
+
+        for i, elem in enumerate(data_all_code):
             elem = elem.text.split('&')
             data_all.append([data.split('=')[1] for data in elem])
-            window['-PROG-'].update_bar(int(i*step))
-            i += 1
+            window['-PROG-'].update_bar(35000 + int(i*step))
+
 
         index = [x for x in range(1, len(data_all) + 1)]
         result_data = pd.DataFrame(data_all, index, columns_names)
@@ -105,7 +108,7 @@ finally:
         for carid in carid_list:
             xlsx_maker.xlsx_maker(carid, result_data, cur_dir, d_start, d_finish)
 
-        window.close()
+    window.close()
 
 
 
